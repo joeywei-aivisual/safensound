@@ -1,6 +1,24 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld hours" : {
+
+    },
+    "%lld 小時" : {
+
+    },
+    "Add" : {
+
+    },
+    "Add at least one emergency contact who will be notified if you miss your check-in" : {
+
+    },
+    "Back" : {
+
+    },
+    "Cancel" : {
+
+    },
     "Check in immediately" : {
       "localizations" : {
         "en" : {
@@ -22,6 +40,15 @@
           }
         }
       }
+    },
+    "Check-in Failed" : {
+
+    },
+    "Check-in Threshold" : {
+
+    },
+    "Complete" : {
+
     },
     "Daily Check-in Reminder" : {
       "localizations" : {
@@ -45,6 +72,12 @@
         }
       }
     },
+    "Daily Reminder" : {
+
+    },
+    "Email" : {
+
+    },
     "Emergency Contacts" : {
       "localizations" : {
         "en" : {
@@ -66,6 +99,9 @@
           }
         }
       }
+    },
+    "Enable Daily Reminder" : {
+
     },
     "Expired" : {
       "localizations" : {
@@ -111,6 +147,30 @@
         }
       }
     },
+    "family@example.com" : {
+
+    },
+    "Get a daily reminder to check in" : {
+
+    },
+    "How long before we notify your emergency contacts?" : {
+
+    },
+    "If you don't check in within %lld hours, we'll send an email to your emergency contacts." : {
+
+    },
+    "Joey, 美好的一天開始了" : {
+
+    },
+    "Let's set up your safety check-in system" : {
+
+    },
+    "Name" : {
+
+    },
+    "Next" : {
+
+    },
     "Normal" : {
       "localizations" : {
         "en" : {
@@ -132,6 +192,9 @@
           }
         }
       }
+    },
+    "OK" : {
+
     },
     "Personal Information" : {
       "localizations" : {
@@ -155,6 +218,9 @@
         }
       }
     },
+    "Profile Saved" : {
+
+    },
     "Remaining: %lld hours %lld mins" : {
       "localizations" : {
         "en" : {
@@ -177,6 +243,18 @@
         }
       }
     },
+    "Reminder Time" : {
+
+    },
+    "Retry" : {
+
+    },
+    "Safe & Sound" : {
+
+    },
+    "Save" : {
+
+    },
     "Settings" : {
       "localizations" : {
         "en" : {
@@ -198,6 +276,18 @@
           }
         }
       }
+    },
+    "Settings Saved" : {
+
+    },
+    "Tell us about yourself" : {
+
+    },
+    "This is optional. You can always change this later in settings." : {
+
+    },
+    "Threshold" : {
+
     },
     "Time to check in! Give a smile to those who care about you." : {
       "localizations" : {
@@ -243,6 +333,9 @@
         }
       }
     },
+    "Welcome to Safe & Sound" : {
+
+    },
     "Your check-in did not go through." : {
       "localizations" : {
         "en" : {
@@ -264,6 +357,63 @@
           }
         }
       }
+    },
+    "今日設定概覽" : {
+
+    },
+    "介面語言" : {
+
+    },
+    "來簽到打一聲招呼吧。" : {
+
+    },
+    "保持好心情，若親友收到未簽到郵件，請他們儘快聯繫您確認安全。" : {
+
+    },
+    "個人資訊" : {
+
+    },
+    "儲存設定並同步" : {
+
+    },
+    "最後簽到: %@" : {
+
+    },
+    "刪除" : {
+
+    },
+    "安全計時: %@" : {
+
+    },
+    "已新增 %lld 位緊急聯絡人" : {
+
+    },
+    "提示：可新增多位家人信箱，並告知他們留意活著麼的提醒郵件。" : {
+
+    },
+    "提醒閾值: 超過%lld小時未簽到將向聯絡人寄送郵件" : {
+
+    },
+    "提醒閾值：%lld 小時未簽到" : {
+
+    },
+    "新增" : {
+
+    },
+    "每日提醒" : {
+
+    },
+    "每日提醒：%@" : {
+
+    },
+    "每日提醒簽到" : {
+
+    },
+    "繁體中文" : {
+
+    },
+    "開啟每日提醒後，會在您設定的時間推送本地通知提醒您簽到。" : {
+
     }
   },
   "version" : "1.0"
