@@ -19,9 +19,22 @@
 		BF42519A2F1611A800F6B6FE /* safensound.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = safensound.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BFF816AE2F16268F00B0A29F /* Exceptions for "safensound" folder in "safensound" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BF4251992F1611A800F6B6FE /* safensound */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		BF42519C2F1611A800F6B6FE /* safensound */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BFF816AE2F16268F00B0A29F /* Exceptions for "safensound" folder in "safensound" target */,
+			);
 			path = safensound;
 			sourceTree = "<group>";
 		};
