@@ -55,7 +55,7 @@ struct DailyReminderView: View {
         .alert("Settings Saved", isPresented: $showingSaveAlert) {
             Button("OK", role: .cancel) {}
         }
-        .onChange(of: dailyReminderEnabled) { enabled in
+        .onChange(of: dailyReminderEnabled) { _, enabled in
             if enabled {
                 Task {
                     await NotificationService.shared.scheduleDailyReminder(at: reminderTime)

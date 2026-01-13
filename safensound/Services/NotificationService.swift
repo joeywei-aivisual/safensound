@@ -12,7 +12,8 @@ import FirebaseAuth
 import UserNotifications
 import OSLog
 
-class NotificationService: ObservableObject {
+@MainActor
+class NotificationService {
     static let shared = NotificationService()
     private let logger = Logger.api
     
@@ -22,7 +23,6 @@ class NotificationService: ObservableObject {
     
     // MARK: - Token Management
     
-    @MainActor
     func getFCMToken() async -> String? {
         do {
             let token = try await Messaging.messaging().token()
@@ -34,7 +34,6 @@ class NotificationService: ObservableObject {
         }
     }
     
-    @MainActor
     func registerFCMTokenWithFirebase() async {
         guard !fcmToken.isEmpty else {
             logger.warning("No FCM token available to register with Firebase")
@@ -72,7 +71,6 @@ class NotificationService: ObservableObject {
         }
     }
     
-    @MainActor
     func deleteFCMToken() async {
         do {
             try await Messaging.messaging().deleteToken()

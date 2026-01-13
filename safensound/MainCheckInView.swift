@@ -5,6 +5,7 @@
 
 import SwiftUI
 import FirebaseAuth
+import Combine
 
 struct MainCheckInView: View {
     @StateObject private var viewModel = MainCheckInViewModel()
@@ -137,7 +138,7 @@ struct MainCheckInView: View {
             }
         }
         .preferredColorScheme(.dark)
-        .onChange(of: scenePhase) { newPhase in
+        .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 viewModel.updateRemainingTime()
             }
@@ -189,7 +190,9 @@ class MainCheckInViewModel: ObservableObject {
     func startTimer() {
         updateRemainingTime()
         timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
-            self?.updateRemainingTime()
+            Task { @MainActor in
+                self?.updateRemainingTime()
+            }
         }
     }
     
@@ -229,7 +232,7 @@ class MainCheckInViewModel: ObservableObject {
                     "systemVersion": UIDevice.current.systemVersion
                 ]
                 
-                let response = try await FirebaseService.shared.recordHeartbeat(
+                _ = try await FirebaseService.shared.recordHeartbeat(
                     timezone: timezone,
                     deviceInfo: deviceInfo
                 )

@@ -126,7 +126,7 @@ struct OnboardingView: View {
             }
             
             // Create user profile
-            let profile = UserProfile(
+            _ = UserProfile(
                 userId: userId,
                 name: name,
                 email: email,
