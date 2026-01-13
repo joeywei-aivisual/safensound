@@ -1,0 +1,42 @@
+{
+  "name": "safensound-functions",
+  "version": "1.0.0",
+  "description": "Firebase Functions for Safe & Sound app",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "start": "npm run shell",
+    "dev": "npm run build:watch & firebase emulators:start --only functions",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "deploy": "npm run build && firebase deploy --only functions",
+    "deploy:dev": "npm run build && firebase deploy --only functions:recordHeartbeatDev,functions:registerFCMTokenDev",
+    "deploy:prod": "npm run build && firebase deploy --only functions:recordHeartbeat,functions:registerFCMToken,functions:checkMissedHeartbeats,functions:processScheduledAlerts",
+    "deploy:all": "npm run build && firebase deploy --only functions",
+    "logs": "firebase functions:log",
+    "clean": "rm -rf lib",
+    "rebuild": "npm run clean && npm run build",
+    "test:build": "npm run build && echo 'Build successful!'"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "dependencies": {
+    "@google-cloud/secret-manager": "^5.6.0",
+    "@sendgrid/mail": "^7.7.0",
+    "date-fns-tz": "^3.0.0",
+    "firebase-admin": "^11.8.0",
+    "firebase-functions": "^6.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
+    "firebase-functions-test": "^3.1.0",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  },
+  "private": true
+}
