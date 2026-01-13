@@ -19,8 +19,7 @@ After creating the repo, run these commands:
 cd /Users/joeywei/Project/safensound
 
 # Add GitHub as remote (replace YOUR_USERNAME with your GitHub username)
-git remote add origin https://github.com/YOUR_USERNAME/safensound.git
-
+git remote add origin https://github.com/joeywei-aivisual/safensound
 # Push to GitHub
 git push -u origin main
 ```
