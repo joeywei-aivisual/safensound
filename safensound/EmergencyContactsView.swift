@@ -135,6 +135,8 @@ struct EmergencyContactsView: View {
             do {
                 try await FirebaseService.shared.updateEmergencyContacts(userId: userId, contacts: newContacts)
                 onSuccess()
+                // Refresh shared profile so MainCheckInView and SettingsView update immediately
+                UserProfileManager.shared.loadProfile()
             } catch {
                 errorMessage = error.localizedDescription
                 showingErrorAlert = true

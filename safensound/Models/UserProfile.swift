@@ -5,7 +5,7 @@
 
 import Foundation
 
-struct UserProfile: Codable {
+struct UserProfile: Codable, Equatable {
     var userId: String // From Auth.auth().currentUser.uid
     var name: String
     var email: String

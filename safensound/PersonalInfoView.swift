@@ -65,6 +65,8 @@ struct PersonalInfoView: View {
         Task {
             do {
                 try await FirebaseService.shared.updatePersonalDetails(userId: userId, name: name, email: email)
+                // Refresh shared profile so MainCheckInView and SettingsView update immediately
+                UserProfileManager.shared.loadProfile()
                 showingSaveAlert = true
             } catch {
                 errorMessage = error.localizedDescription

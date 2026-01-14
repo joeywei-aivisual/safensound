@@ -10,6 +10,7 @@ import UserNotifications
 
 struct MainCheckInView: View {
     @StateObject private var viewModel = MainCheckInViewModel()
+    @ObservedObject private var userProfileManager = UserProfileManager.shared
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage(.onboardingCompleted) private var onboardingCompleted = false
     
@@ -21,7 +22,7 @@ struct MainCheckInView: View {
                 VStack(spacing: 20) {
                     // Motivational Card
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Hello, \(viewModel.userProfile?.name ?? "Friend")")
+                        Text("Hello, \(userProfileManager.userProfile?.name ?? "Friend")")
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(.white)
@@ -97,7 +98,7 @@ struct MainCheckInView: View {
                             .font(.subheadline)
                             .foregroundColor(.white.opacity(0.8))
                         
-                        Text("Threshold: We will notify your contacts if you don't check in for \(viewModel.userProfile?.checkInThreshold ?? 72) hours.")
+                        Text("Threshold: We will notify your contacts if you don't check in for \(userProfileManager.userProfile?.checkInThreshold ?? 72) hours.")
                             .font(.caption)
                             .foregroundColor(.white.opacity(0.6))
                         
@@ -148,13 +149,14 @@ struct MainCheckInView: View {
             }
         }
         .task {
-            // ✅ Fix: Load profile on app launch
-            viewModel.loadUserProfile()
+            // Load shared profile on app launch and when view appears
+            userProfileManager.loadProfile()
             viewModel.startTimer()
         }
-        .onAppear {
-            // ✅ Fix: Reload profile when view appears (e.g., returning from settings)
-            viewModel.loadUserProfile()
+        .onChange(of: userProfileManager.userProfile) { _, newProfile in
+            // Update viewModel when shared profile changes
+            viewModel.userProfile = newProfile
+            viewModel.updateRemainingTime()
         }
     }
     
@@ -262,8 +264,8 @@ class MainCheckInViewModel: ObservableObject {
                     deviceInfo: deviceInfo
                 )
                 
-                // ✅ Fix: Reload profile to confirm server sync
-                self.loadUserProfile()
+                // Reload shared profile to confirm server sync
+                UserProfileManager.shared.loadProfile()
                 
                 // Show success
                 buttonState = .success

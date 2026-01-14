@@ -7,7 +7,7 @@ import SwiftUI
 import FirebaseAuth
 
 struct SettingsView: View {
-    @State private var userProfile: UserProfile?
+    @ObservedObject private var userProfileManager = UserProfileManager.shared
     
     var body: some View {
         List {
@@ -17,7 +17,7 @@ struct SettingsView: View {
                     Text("Settings Overview")
                         .font(.headline)
                     
-                    if let profile = userProfile {
+                    if let profile = userProfileManager.userProfile {
                         Text("Emergency Contacts: \(profile.emergencyContacts.count)")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
@@ -48,7 +48,7 @@ struct SettingsView: View {
                         VStack(alignment: .leading) {
                             Text("Personal Information")
                                 .font(.headline)
-                            Text(userProfile?.name ?? "User")
+                            Text(userProfileManager.userProfile?.name ?? "User")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -84,7 +84,7 @@ struct SettingsView: View {
                         VStack(alignment: .leading) {
                             Text("Daily Reminder")
                                 .font(.headline)
-                            Text("Threshold: \(userProfile?.checkInThreshold ?? 72) hours")
+                            Text("Threshold: \(userProfileManager.userProfile?.checkInThreshold ?? 72) hours")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -95,16 +95,10 @@ struct SettingsView: View {
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.large)
         .task {
-            await loadProfile()
-        }
-    }
-    
-    private func loadProfile() async {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-        do {
-            userProfile = try await FirebaseService.shared.fetchUserProfile(userId: userId)
-        } catch {
-            print("Error loading profile: \(error)")
+            // Load shared profile if not already loaded
+            if userProfileManager.userProfile == nil {
+                userProfileManager.loadProfile()
+            }
         }
     }
 }

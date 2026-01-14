@@ -116,6 +116,9 @@ struct DailyReminderView: View {
                     NotificationService.shared.cancelDailyReminder()
                 }
                 
+                // Refresh shared profile so MainCheckInView updates immediately
+                UserProfileManager.shared.loadProfile()
+                
                 showingSaveAlert = true
             } catch {
                 errorMessage = error.localizedDescription
