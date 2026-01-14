@@ -9,12 +9,14 @@ import Foundation
 import FirebaseCore
 import FirebaseFunctions
 import FirebaseAuth
+import FirebaseFirestore
 import OSLog
 
 class FirebaseService {
     static let shared = FirebaseService()
     private let logger = Logger.api
     private let functions = Functions.functions()
+    private let db = Firestore.firestore()
     
     private init() {}
     
@@ -28,6 +30,13 @@ class FirebaseService {
         // Release builds use production functions
         return baseName
         #endif
+    }
+    
+    // MARK: - User Profile
+    
+    func saveUserProfile(_ profile: UserProfile) async throws {
+        try db.collection("users").document(profile.userId).setData(from: profile)
+        logger.info("✅ User profile saved for user: \(profile.userId)")
     }
     
     // MARK: - Heartbeat Recording

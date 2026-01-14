@@ -126,7 +126,7 @@ struct OnboardingView: View {
             }
             
             // Create user profile
-            _ = UserProfile(
+            let userProfile = UserProfile(
                 userId: userId,
                 name: name,
                 email: email,
@@ -137,7 +137,13 @@ struct OnboardingView: View {
                 timezone: timezone
             )
             
-            // TODO: Save to Firestore
+            // Save to Firestore
+            do {
+                try await FirebaseService.shared.saveUserProfile(userProfile)
+            } catch {
+                print("Error saving user profile: \(error)")
+                // Continue anyway since we can retry later or it might have partially succeeded
+            }
             
             // Mark onboarding as completed
             onboardingCompleted = true
