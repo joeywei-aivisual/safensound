@@ -114,7 +114,7 @@ If you believe you received this email in error or wish to be removed from ${use
   const emails = emergencyContacts.map(contact => ({
     to: contact.email,
     from: {
-      email: 'noreply@safensound.app', // TODO: Update with your verified sender
+      email: 'support@aivisual.io',
       name: 'Safe & Sound'
     },
     subject,
