@@ -75,7 +75,7 @@
     "Daily Reminder" : {
 
     },
-    "Email" : {
+    "Email (Optional)" : {
 
     },
     "Emergency Contacts" : {
@@ -101,6 +101,9 @@
       }
     },
     "Enable Daily Reminder" : {
+
+    },
+    "Error" : {
 
     },
     "Expired" : {
@@ -194,6 +197,9 @@
       }
     },
     "OK" : {
+
+    },
+    "Personal Info" : {
 
     },
     "Personal Information" : {
@@ -371,9 +377,6 @@
 
     },
     "保持好心情，若親友收到未簽到郵件，請他們儘快聯繫您確認安全。" : {
-
-    },
-    "個人資訊" : {
 
     },
     "儲存設定並同步" : {

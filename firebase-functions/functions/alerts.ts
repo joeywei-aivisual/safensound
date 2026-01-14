@@ -121,7 +121,7 @@ async function sendEmailAlert(userId: string, alertData: any) {
   // Send email to all emergency contacts
   await sendEmergencyEmail({
     userName,
-    userEmail: userData.email,
+    userEmail: userData.email || "", // Pass empty string if email is missing
     emergencyContacts,
     lastHeartbeat,
     timezone,

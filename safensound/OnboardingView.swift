@@ -12,7 +12,6 @@ struct OnboardingView: View {
     
     @State private var currentStep = 0
     @State private var name: String = ""
-    @State private var email: String = ""
     @State private var emergencyContacts: [EmergencyContact] = []
     @State private var newContactEmail: String = ""
     @State private var selectedThreshold: Int = 72
@@ -44,7 +43,7 @@ struct OnboardingView: View {
                     .tag(0)
                 
                 // Step 2: Profile Setup
-                ProfileStepView(name: $name, email: $email)
+                ProfileStepView(name: $name)
                     .tag(1)
                 
                 // Step 3: Emergency Contacts
@@ -106,7 +105,7 @@ struct OnboardingView: View {
     private var canProceed: Bool {
         switch currentStep {
         case 0: return true
-        case 1: return !name.isEmpty && !email.isEmpty
+        case 1: return !name.isEmpty
         case 2: return !emergencyContacts.isEmpty
         case 3: return true
         case 4: return true
@@ -134,7 +133,7 @@ struct OnboardingView: View {
             let userProfile = UserProfile(
                 userId: userId,
                 name: name,
-                email: email,
+                email: "", // Email is now optional
                 checkInThreshold: selectedThreshold,
                 emergencyContacts: emergencyContacts,
                 dailyReminderEnabled: dailyReminderEnabled,
@@ -182,7 +181,6 @@ struct WelcomeStepView: View {
 
 struct ProfileStepView: View {
     @Binding var name: String
-    @Binding var email: String
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -197,11 +195,6 @@ struct ProfileStepView: View {
             TextField("Name", text: $name)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.vertical)
-            
-            TextField("Email", text: $email)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .keyboardType(.emailAddress)
-                .autocapitalization(.none)
         }
         .padding()
     }

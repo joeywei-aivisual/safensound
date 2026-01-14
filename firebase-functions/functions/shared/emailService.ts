@@ -9,7 +9,7 @@ if (SENDGRID_API_KEY) {
 
 interface EmergencyEmailParams {
   userName: string;
-  userEmail: string;
+  userEmail?: string;
   emergencyContacts: Array<{ email: string; name?: string }>;
   lastHeartbeat: Date;
   timezone: string;
@@ -35,6 +35,11 @@ export async function sendEmergencyEmail(params: EmergencyEmailParams): Promise<
     timezone,
     'PPpp' // e.g., "Jan 12, 2026, 9:30 PM"
   );
+
+  // Helper variables for conditional formatting
+  const userIdentity = userEmail ? `<strong>${userName}</strong> (${userEmail})` : `<strong>${userName}</strong>`;
+  const emailLine = userEmail ? `<li><strong>Email:</strong> ${userEmail}</li>` : '';
+  const emailTextLine = userEmail ? `Email: ${userEmail}` : '';
 
   // Create email content
   const subject = `⚠️ Safety Alert: ${userName} has not checked in`;
@@ -62,7 +67,7 @@ export async function sendEmergencyEmail(params: EmergencyEmailParams): Promise<
         <div class="content">
           <p>Hello,</p>
           
-          <p>You are receiving this email because you are listed as an emergency contact for <strong>${userName}</strong> (${userEmail}) on the Safe & Sound app.</p>
+          <p>You are receiving this email because you are listed as an emergency contact for ${userIdentity} on the Safe & Sound app.</p>
           
           <div class="alert-box">
             <h3>⚠️ Alert Details</h3>
@@ -74,7 +79,7 @@ export async function sendEmergencyEmail(params: EmergencyEmailParams): Promise<
             <h3>What should you do?</h3>
             <p>Please try to contact <strong>${userName}</strong> as soon as possible to ensure their safety. You can reach them at:</p>
             <ul>
-              <li><strong>Email:</strong> ${userEmail}</li>
+              ${emailLine}
             </ul>
             <p>If you cannot reach them, please consider contacting local authorities for a wellness check.</p>
           </div>
@@ -92,7 +97,7 @@ export async function sendEmergencyEmail(params: EmergencyEmailParams): Promise<
   const textContent = `
 SAFETY ALERT
 
-You are receiving this email because you are listed as an emergency contact for ${userName} (${userEmail}) on the Safe & Sound app.
+You are receiving this email because you are listed as an emergency contact for ${userName} ${userEmail ? `(${userEmail})` : ''} on the Safe & Sound app.
 
 ⚠️ ALERT DETAILS
 ${userName} has not checked in for more than ${thresholdHours} hours.
@@ -100,7 +105,7 @@ Last Seen: ${formattedLastSeen} (${timezone})
 
 WHAT SHOULD YOU DO?
 Please try to contact ${userName} as soon as possible to ensure their safety.
-Email: ${userEmail}
+${emailTextLine}
 
 If you cannot reach them, please consider contacting local authorities for a wellness check.
 

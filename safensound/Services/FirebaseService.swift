@@ -39,6 +39,22 @@ class FirebaseService {
         logger.info("✅ User profile saved for user: \(profile.userId)")
     }
     
+    func fetchUserProfile(userId: String) async throws -> UserProfile {
+        let snapshot = try await db.collection("users").document(userId).getDocument()
+        return try snapshot.data(as: UserProfile.self)
+    }
+    
+    func updatePersonalDetails(userId: String, name: String, email: String) async throws {
+        let data: [String: Any] = [
+            "name": name,
+            "email": email,
+            "lastUpdated": FieldValue.serverTimestamp()
+        ]
+        
+        try await db.collection("users").document(userId).updateData(data)
+        logger.info("✅ User details updated for user: \(userId)")
+    }
+    
     // MARK: - Heartbeat Recording
     
     func recordHeartbeat(timezone: String, deviceInfo: [String: String]) async throws -> [String: Any] {
