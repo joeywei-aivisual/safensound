@@ -1,4 +1,4 @@
-import * as functions from 'firebase-functions';
+import {onCall, HttpsError} from 'firebase-functions/v2/https';
 import * as admin from 'firebase-admin';
 
 const db = admin.firestore();
@@ -14,17 +14,17 @@ interface FCMTokenRequest {
   };
 }
 
-async function registerFCMTokenHandler(data: FCMTokenRequest, context: functions.https.CallableContext) {
+async function registerFCMTokenHandler(request: any) {
   // Verify user is authenticated
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { userId, fcmToken, deviceInfo } = data;
+  const { userId, fcmToken, deviceInfo} = request.data as FCMTokenRequest;
 
   // Verify userId matches authenticated user
-  if (userId !== context.auth.uid) {
-    throw new functions.https.HttpsError('permission-denied', 'User ID mismatch');
+  if (userId !== request.auth.uid) {
+    throw new HttpsError('permission-denied', 'User ID mismatch');
   }
 
   try {
@@ -54,12 +54,12 @@ async function registerFCMTokenHandler(data: FCMTokenRequest, context: functions
     };
   } catch (error) {
     console.error('Error registering FCM token:', error);
-    throw new functions.https.HttpsError('internal', 'Failed to register FCM token');
+    throw new HttpsError('internal', 'Failed to register FCM token');
   }
 }
 
 // Production function
-export const registerFCMToken = functions.https.onCall(registerFCMTokenHandler);
+export const registerFCMToken = onCall(registerFCMTokenHandler);
 
 // Development function
-export const registerFCMTokenDev = functions.https.onCall(registerFCMTokenHandler);
+export const registerFCMTokenDev = onCall(registerFCMTokenHandler);

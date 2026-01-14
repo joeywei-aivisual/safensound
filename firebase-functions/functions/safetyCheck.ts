@@ -1,13 +1,10 @@
-import * as functions from 'firebase-functions';
+import {onSchedule} from 'firebase-functions/v2/scheduler';
 import * as admin from 'firebase-admin';
 
 const db = admin.firestore();
 
 // Run every 30 minutes
-export const checkMissedHeartbeats = functions.pubsub
-  .schedule('*/30 * * * *')
-  .timeZone('UTC')
-  .onRun(async (context) => {
+export const checkMissedHeartbeats = onSchedule('*/30 * * * *', async (event) => {
     console.log('Starting missed heartbeat check...');
 
     try {
@@ -94,12 +91,6 @@ export const checkMissedHeartbeats = functions.pubsub
       await batch.commit();
 
       console.log(`Scheduled ${preNotificationCount} pre-notifications and ${emailAlertCount} email alerts`);
-
-      return {
-        success: true,
-        preNotificationCount,
-        emailAlertCount
-      };
     } catch (error) {
       console.error('Error checking missed heartbeats:', error);
       throw error;

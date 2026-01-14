@@ -1,14 +1,11 @@
-import * as functions from 'firebase-functions';
+import {onSchedule} from 'firebase-functions/v2/scheduler';
 import * as admin from 'firebase-admin';
 import { sendEmergencyEmail } from './shared/emailService';
 
 const db = admin.firestore();
 
 // Run every 2 minutes
-export const processScheduledAlerts = functions.pubsub
-  .schedule('*/2 * * * *')
-  .timeZone('UTC')
-  .onRun(async (context) => {
+export const processScheduledAlerts = onSchedule('*/2 * * * *', async (event) => {
     console.log('Processing scheduled alerts...');
 
     try {
@@ -56,10 +53,7 @@ export const processScheduledAlerts = functions.pubsub
         }
       }
 
-      return {
-        success: true,
-        processedCount: alertsSnapshot.size
-      };
+      console.log(`Processed ${alertsSnapshot.size} alerts`);
     } catch (error) {
       console.error('Error processing scheduled alerts:', error);
       throw error;

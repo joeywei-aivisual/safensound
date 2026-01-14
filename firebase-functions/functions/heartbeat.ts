@@ -1,4 +1,4 @@
-import * as functions from 'firebase-functions';
+import {onCall, HttpsError} from 'firebase-functions/v2/https';
 import * as admin from 'firebase-admin';
 
 const db = admin.firestore();
@@ -13,17 +13,17 @@ interface HeartbeatRequest {
   };
 }
 
-async function recordHeartbeatHandler(data: HeartbeatRequest, context: functions.https.CallableContext) {
+async function recordHeartbeatHandler(request: any) {
   // Verify user is authenticated
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { userId, timezone, deviceInfo } = data;
+  const { userId, timezone, deviceInfo } = request.data as HeartbeatRequest;
 
   // Verify userId matches authenticated user
-  if (userId !== context.auth.uid) {
-    throw new functions.https.HttpsError('permission-denied', 'User ID mismatch');
+  if (userId !== request.auth.uid) {
+    throw new HttpsError('permission-denied', 'User ID mismatch');
   }
 
   try {
@@ -68,12 +68,12 @@ async function recordHeartbeatHandler(data: HeartbeatRequest, context: functions
     };
   } catch (error) {
     console.error('Error recording heartbeat:', error);
-    throw new functions.https.HttpsError('internal', 'Failed to record heartbeat');
+    throw new HttpsError('internal', 'Failed to record heartbeat');
   }
 }
 
 // Production function
-export const recordHeartbeat = functions.https.onCall(recordHeartbeatHandler);
+export const recordHeartbeat = onCall(recordHeartbeatHandler);
 
 // Development function
-export const recordHeartbeatDev = functions.https.onCall(recordHeartbeatHandler);
+export const recordHeartbeatDev = onCall(recordHeartbeatHandler);
