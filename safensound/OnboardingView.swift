@@ -17,7 +17,12 @@ struct OnboardingView: View {
     @State private var newContactEmail: String = ""
     @State private var selectedThreshold: Int = 72
     @State private var dailyReminderEnabled: Bool = false
-    @State private var reminderTime: Date = Calendar.current.date(from: DateComponents(hour: 9, minute: 0)) ?? Date()
+    @State private var reminderTime: Date = {
+        var components = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+        components.hour = 9
+        components.minute = 0
+        return Calendar.current.date(from: components) ?? Date()
+    }()
     
     let thresholds = [24, 48, 72]
     

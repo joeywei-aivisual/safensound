@@ -36,6 +36,8 @@ extension Logger {
 struct safensoundApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
+    @State private var isAuthReady = false
+    
     init() {
         // ToDo: Configure App Check before Firebase initialization
 //        let providerFactory = SafeNSoundAppCheckProviderFactory()
@@ -43,25 +45,36 @@ struct safensoundApp: App {
         
         // Initialize Firebase
         FirebaseApp.configure()
-        
-        // Sign in anonymously if no user exists
-        Task {
-            if Auth.auth().currentUser == nil {
-                do {
-                    let result = try await Auth.auth().signInAnonymously()
-                    Logger.api.info("✅ Anonymous user signed in: \(result.user.uid)")
-                } catch {
-                    Logger.api.error("❌ Failed to sign in anonymously: \(error.localizedDescription)")
-                }
-            } else {
-                Logger.api.info("✅ User already signed in: \(Auth.auth().currentUser?.uid ?? "unknown")")
-            }
-        }
     }
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if isAuthReady {
+                ContentView()
+            } else {
+                ProgressView("Starting SafeNSound...")
+                    .task {
+                        await initializeAuth()
+                    }
+            }
+        }
+    }
+    
+    private func initializeAuth() async {
+        // If already signed in, we are good
+        if Auth.auth().currentUser != nil {
+            isAuthReady = true
+            Logger.api.info("✅ User already signed in: \(Auth.auth().currentUser?.uid ?? "unknown")")
+            return
+        }
+        
+        // Otherwise, sign in anonymously
+        do {
+            let result = try await Auth.auth().signInAnonymously()
+            Logger.api.info("✅ Anonymous user signed in: \(result.user.uid)")
+            isAuthReady = true
+        } catch {
+            Logger.api.error("❌ Failed to sign in anonymously: \(error.localizedDescription)")
         }
     }
 }
