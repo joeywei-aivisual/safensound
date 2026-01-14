@@ -152,6 +152,10 @@ struct MainCheckInView: View {
             viewModel.loadUserProfile()
             viewModel.startTimer()
         }
+        .onAppear {
+            // ✅ Fix: Reload profile when view appears (e.g., returning from settings)
+            viewModel.loadUserProfile()
+        }
     }
     
     private var buttonColor: Color {
