@@ -1,18 +1,11 @@
 import * as sgMail from '@sendgrid/mail';
 import { formatInTimeZone } from 'date-fns-tz';
-import {defineString} from 'firebase-functions/params';
 
-// Define SendGrid API key parameter
-const sendgridApiKey = defineString('SENDGRID_API_KEY');
-
-// Initialize SendGrid
-const initSendGrid = () => {
-  const apiKey = sendgridApiKey.value();
-  if (apiKey) {
-    sgMail.setApiKey(apiKey);
-  }
-  return apiKey;
-};
+// Initialize SendGrid with API key from environment
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || '';
+if (SENDGRID_API_KEY) {
+  sgMail.setApiKey(SENDGRID_API_KEY);
+}
 
 interface EmergencyEmailParams {
   userName: string;
@@ -26,8 +19,7 @@ interface EmergencyEmailParams {
 export async function sendEmergencyEmail(params: EmergencyEmailParams): Promise<void> {
   const { userName, userEmail, emergencyContacts, lastHeartbeat, timezone, thresholdHours } = params;
 
-  const apiKey = initSendGrid();
-  if (!apiKey) {
+  if (!SENDGRID_API_KEY) {
     console.error('SendGrid API key not configured');
     throw new Error('Email service not configured');
   }

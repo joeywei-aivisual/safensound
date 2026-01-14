@@ -2,7 +2,7 @@
   "name": "safensound-functions",
   "version": "1.0.0",
   "description": "Firebase Functions for Safe & Sound app",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
