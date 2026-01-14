@@ -59,7 +59,17 @@ async function registerFCMTokenHandler(request: any) {
 }
 
 // Production function
-export const registerFCMToken = onCall(registerFCMTokenHandler);
+export const registerFCMToken = onCall(
+  {
+    cors: true,
+  },
+  registerFCMTokenHandler
+);
 
 // Development function
-export const registerFCMTokenDev = onCall(registerFCMTokenHandler);
+export const registerFCMTokenDev = onCall(
+  {
+    cors: true,
+  },
+  registerFCMTokenHandler
+);

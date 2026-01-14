@@ -1,4 +1,4 @@
-import * as sgMail from '@sendgrid/mail';
+import sgMail from '@sendgrid/mail';
 import { formatInTimeZone } from 'date-fns-tz';
 
 // Initialize SendGrid with API key from environment

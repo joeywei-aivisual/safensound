@@ -73,7 +73,17 @@ async function recordHeartbeatHandler(request: any) {
 }
 
 // Production function
-export const recordHeartbeat = onCall(recordHeartbeatHandler);
+export const recordHeartbeat = onCall(
+  {
+    cors: true,
+  },
+  recordHeartbeatHandler
+);
 
 // Development function
-export const recordHeartbeatDev = onCall(recordHeartbeatHandler);
+export const recordHeartbeatDev = onCall(
+  {
+    cors: true,
+  },
+  recordHeartbeatHandler
+);
