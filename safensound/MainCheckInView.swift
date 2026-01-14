@@ -6,6 +6,7 @@
 import SwiftUI
 import FirebaseAuth
 import Combine
+import UserNotifications
 
 struct MainCheckInView: View {
     @StateObject private var viewModel = MainCheckInViewModel()
@@ -20,12 +21,12 @@ struct MainCheckInView: View {
                 VStack(spacing: 20) {
                     // Motivational Card
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Joey, 美好的一天開始了")
+                        Text("Hello, \(viewModel.userProfile?.name ?? "Friend")")
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(.white)
                         
-                        Text("來簽到打一聲招呼吧。")
+                        Text("Start your day with a check-in.")
                             .font(.body)
                             .foregroundColor(.white.opacity(0.8))
                     }
@@ -64,8 +65,9 @@ struct MainCheckInView: View {
                                     Image(systemName: "hand.wave.fill")
                                         .font(.system(size: 60))
                                         .foregroundColor(.white)
-                                    Text(String(localized: "Check in immediately"))
-                                        .font(.caption)
+                                    Text("Check In")
+                                        .font(.title3)
+                                        .fontWeight(.bold)
                                         .foregroundColor(.white)
                                 }
                             }
@@ -77,6 +79,8 @@ struct MainCheckInView: View {
                     // Status Card
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
+                            // Note: Ensure your CheckInStatus enum returns English strings,
+                            // or replace this usage with a simple switch if needed.
                             Text(viewModel.status.displayText)
                                 .font(.caption)
                                 .fontWeight(.semibold)
@@ -89,15 +93,15 @@ struct MainCheckInView: View {
                             Spacer()
                         }
                         
-                        Text("最後簽到: \(viewModel.formattedLastCheckIn)")
+                        Text("Last Check-in: \(viewModel.formattedLastCheckIn)")
                             .font(.subheadline)
                             .foregroundColor(.white.opacity(0.8))
                         
-                        Text("提醒閾值: 超過\(viewModel.userProfile?.checkInThreshold ?? 72)小時未簽到將向聯絡人寄送郵件")
+                        Text("Threshold: We will notify your contacts if you don't check in for \(viewModel.userProfile?.checkInThreshold ?? 72) hours.")
                             .font(.caption)
                             .foregroundColor(.white.opacity(0.6))
                         
-                        Text("安全計時: \(viewModel.formattedRemainingTime)")
+                        Text("Safety Timer: \(viewModel.formattedRemainingTime)")
                             .font(.headline)
                             .foregroundColor(viewModel.status == .warning ? .orange : .green)
                     }
@@ -110,7 +114,7 @@ struct MainCheckInView: View {
                     Spacer()
                     
                     // Footer
-                    Text("保持好心情，若親友收到未簽到郵件，請他們儘快聯繫您確認安全。")
+                    Text("If your contacts receive an alert, ask them to contact you immediately to confirm your safety.")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.5))
                         .multilineTextAlignment(.center)
@@ -131,7 +135,7 @@ struct MainCheckInView: View {
                 Button("Retry", action: viewModel.handleCheckIn)
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text(String(localized: "Failed - No Internet") + "\n" + String(localized: "Your check-in did not go through."))
+                Text("Failed to check in. Please check your internet connection.")
             }
             .sheet(isPresented: .constant(!onboardingCompleted)) {
                 OnboardingView()
@@ -140,10 +144,12 @@ struct MainCheckInView: View {
         .preferredColorScheme(.dark)
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
-                viewModel.updateRemainingTime()
+                viewModel.loadUserProfile()
             }
         }
-        .onAppear {
+        .task {
+            // ✅ Fix: Load profile on app launch
+            viewModel.loadUserProfile()
             viewModel.startTimer()
         }
     }
@@ -174,7 +180,7 @@ class MainCheckInViewModel: ObservableObject {
     var formattedRemainingTime: String {
         let hours = Int(remainingTime) / 3600
         let minutes = (Int(remainingTime) % 3600) / 60
-        return String(localized: "Remaining: \(hours) hours \(minutes) mins")
+        return "Remaining: \(hours) hours \(minutes) mins"
     }
     
     var formattedLastCheckIn: String {
@@ -185,6 +191,21 @@ class MainCheckInViewModel: ObservableObject {
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
         return formatter.string(from: lastHeartbeat)
+    }
+    
+    // ✅ Fix: Function to actually load the user profile
+    func loadUserProfile() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        Task {
+            do {
+                let profile = try await FirebaseService.shared.fetchUserProfile(userId: userId)
+                self.userProfile = profile
+                self.updateRemainingTime()
+            } catch {
+                print("Error loading profile: \(error)")
+            }
+        }
     }
     
     func startTimer() {
@@ -237,13 +258,8 @@ class MainCheckInViewModel: ObservableObject {
                     deviceInfo: deviceInfo
                 )
                 
-                // Update local state
-                if let profile = userProfile {
-                    var updatedProfile = profile
-                    updatedProfile.lastHeartbeat = Date()
-                    updatedProfile.timezone = timezone
-                    userProfile = updatedProfile
-                }
+                // ✅ Fix: Reload profile to confirm server sync
+                self.loadUserProfile()
                 
                 // Show success
                 buttonState = .success
@@ -255,7 +271,6 @@ class MainCheckInViewModel: ObservableObject {
                 // Reset to idle after 2 seconds
                 try await Task.sleep(nanoseconds: 2_000_000_000)
                 buttonState = .idle
-                updateRemainingTime()
                 
             } catch {
                 buttonState = .failed

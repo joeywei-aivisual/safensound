@@ -24,7 +24,7 @@ class SafeNSoundAppCheckProviderFactory: NSObject, AppCheckProviderFactory {
 extension String {
     static let onboardingCompleted = "onboardingCompleted"
     static let fcmToken = "fcmToken"
-    static let preferredLanguage = "preferredLanguage"
+    // Removed: preferredLanguage
 }
 
 // MARK: - Logger
@@ -37,12 +37,12 @@ struct safensoundApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     @State private var isAuthReady = false
-    @AppStorage(.preferredLanguage) private var preferredLanguage = "en"
+    // Removed: @AppStorage for preferredLanguage
     
     init() {
         // ToDo: Configure App Check before Firebase initialization
-//        let providerFactory = SafeNSoundAppCheckProviderFactory()
-//        AppCheck.setAppCheckProviderFactory(providerFactory)
+        // let providerFactory = SafeNSoundAppCheckProviderFactory()
+        // AppCheck.setAppCheckProviderFactory(providerFactory)
         
         // Initialize Firebase
         FirebaseApp.configure()
@@ -52,7 +52,7 @@ struct safensoundApp: App {
         WindowGroup {
             if isAuthReady {
                 ContentView()
-                    .environment(\.locale, Locale(identifier: preferredLanguage))
+                    // Removed: .environment locale modifier
             } else {
                 ProgressView("Starting SafeNSound...")
                     .task {

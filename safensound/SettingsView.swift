@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct SettingsView: View {
     @State private var userProfile: UserProfile?
@@ -13,19 +14,23 @@ struct SettingsView: View {
             // Settings Overview Card
             Section {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("今日設定概覽")
+                    Text("Settings Overview")
                         .font(.headline)
                     
                     if let profile = userProfile {
-                        Text("已新增 \(profile.emergencyContacts.count) 位緊急聯絡人")
+                        Text("Emergency Contacts: \(profile.emergencyContacts.count)")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         
-                        Text("提醒閾值：\(profile.checkInThreshold) 小時未簽到")
+                        Text("Check-in Threshold: \(profile.checkInThreshold) hours")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         
-                        Text("每日提醒：\(profile.dailyReminderEnabled ? "已開啟" : "未開啟")")
+                        Text("Daily Reminder: \(profile.dailyReminderEnabled ? "On" : "Off")")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    } else {
+                        Text("Loading profile...")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
@@ -41,9 +46,9 @@ struct SettingsView: View {
                             .foregroundColor(.blue)
                             .font(.title2)
                         VStack(alignment: .leading) {
-                            Text(String(localized: "Personal Information"))
+                            Text("Personal Information")
                                 .font(.headline)
-                            Text(userProfile?.name ?? "Joey")
+                            Text(userProfile?.name ?? "User")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -59,9 +64,9 @@ struct SettingsView: View {
                             .foregroundColor(.orange)
                             .font(.title2)
                         VStack(alignment: .leading) {
-                            Text(String(localized: "Emergency Contacts"))
+                            Text("Emergency Contacts")
                                 .font(.headline)
-                            Text("已新增 \(userProfile?.emergencyContacts.count ?? 0) 位緊急聯絡人")
+                            Text("Manage contacts")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -77,27 +82,9 @@ struct SettingsView: View {
                             .foregroundColor(.green)
                             .font(.title2)
                         VStack(alignment: .leading) {
-                            Text("每日提醒")
+                            Text("Daily Reminder")
                                 .font(.headline)
-                            Text("提醒閾值：\(userProfile?.checkInThreshold ?? 72) 小時未簽到")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                }
-            }
-            
-            // Interface Language Section
-            Section {
-                NavigationLink(destination: LanguageSelectionView()) {
-                    HStack {
-                        Image(systemName: "globe")
-                            .foregroundColor(.purple)
-                            .font(.title2)
-                        VStack(alignment: .leading) {
-                            Text("介面語言")
-                                .font(.headline)
-                            Text("繁體中文")
+                            Text("Threshold: \(userProfile?.checkInThreshold ?? 72) hours")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -105,8 +92,20 @@ struct SettingsView: View {
                 }
             }
         }
-        .navigationTitle(String(localized: "Settings"))
+        .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.large)
+        .task {
+            await loadProfile()
+        }
+    }
+    
+    private func loadProfile() async {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        do {
+            userProfile = try await FirebaseService.shared.fetchUserProfile(userId: userId)
+        } catch {
+            print("Error loading profile: \(error)")
+        }
     }
 }
 
