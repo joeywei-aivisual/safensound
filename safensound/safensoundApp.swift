@@ -37,9 +37,9 @@ struct safensoundApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     init() {
-        // Configure App Check before Firebase initialization
-        let providerFactory = SafeNSoundAppCheckProviderFactory()
-        AppCheck.setAppCheckProviderFactory(providerFactory)
+        // ToDo: Configure App Check before Firebase initialization
+//        let providerFactory = SafeNSoundAppCheckProviderFactory()
+//        AppCheck.setAppCheckProviderFactory(providerFactory)
         
         // Initialize Firebase
         FirebaseApp.configure()
