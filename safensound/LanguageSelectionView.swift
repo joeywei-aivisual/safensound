@@ -4,22 +4,22 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct LanguageSelectionView: View {
-    @State private var selectedLanguage: String = "zh-Hant"
+    @AppStorage("preferredLanguage") private var selectedLanguage: String = "en"
     
     let languages = [
-        ("zh-Hans", "简体中文", "适合中国大陆及全球简体用户。"),
+        ("en", "English", "Ideal for overseas users worldwide."),
         ("zh-Hant", "繁體中文", "適合港澳台與喜愛繁體的用戶。"),
-        ("en", "English", "Ideal for overseas users worldwide.")
+        ("zh-Hans", "简体中文", "适合中国大陆及全球简体用户。")
     ]
     
     var body: some View {
         List {
             ForEach(languages, id: \.0) { language in
                 Button(action: {
-                    selectedLanguage = language.0
-                    // TODO: Update app language and save to Firestore
+                    selectLanguage(language.0)
                 }) {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
@@ -33,14 +33,30 @@ struct LanguageSelectionView: View {
                         Spacer()
                         if selectedLanguage == language.0 {
                             Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.pink)
+                                .foregroundColor(.blue)
                         }
                     }
                     .padding(.vertical, 8)
                 }
             }
         }
-        .navigationTitle("介面語言")
+        .navigationTitle(String(localized: "Interface Language"))
+    }
+    
+    private func selectLanguage(_ code: String) {
+        // 1. Update AppStorage (UI updates immediately)
+        selectedLanguage = code
+        
+        // 2. Silently sync with Firestore
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        Task {
+            do {
+                try await FirebaseService.shared.updateLanguage(userId: userId, languageCode: code)
+            } catch {
+                print("Error syncing language preference: \(error)")
+            }
+        }
     }
 }
 

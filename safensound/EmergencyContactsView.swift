@@ -4,12 +4,14 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct EmergencyContactsView: View {
-    @State private var contacts: [EmergencyContact] = [
-        EmergencyContact(email: "kevinway809@gmail.com")
-    ]
+    @State private var contacts: [EmergencyContact] = []
     @State private var newContactEmail: String = ""
+    @State private var isSaving: Bool = false
+    @State private var errorMessage: String?
+    @State private var showingErrorAlert = false
     
     var body: some View {
         VStack {
@@ -29,9 +31,10 @@ struct EmergencyContactsView: View {
                         Button(action: {
                             deleteContact(contact)
                         }) {
-                            Text("刪除")
+                            Text("Delete")
                                 .foregroundColor(.red)
                         }
+                        .disabled(isSaving)
                     }
                 }
             }
@@ -42,39 +45,102 @@ struct EmergencyContactsView: View {
                     .keyboardType(.emailAddress)
                     .autocapitalization(.none)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .disabled(isSaving)
                 
                 Button(action: addContact) {
-                    Text("新增")
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(Color.blue)
-                        .cornerRadius(8)
+                    if isSaving {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(Color.blue.opacity(0.7))
+                            .cornerRadius(8)
+                    } else {
+                        Text("Add")
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(canAddContact ? Color.blue : Color.gray)
+                            .cornerRadius(8)
+                    }
                 }
-                .disabled(newContactEmail.isEmpty)
+                .disabled(!canAddContact || isSaving)
             }
             .padding()
             
-            Text("提示：可新增多位家人信箱，並告知他們留意活著麼的提醒郵件。")
+            Text("Tip: You can add multiple family emails. Please inform them to look out for Safe & Sound emails.")
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .padding(.horizontal)
         }
         .navigationTitle(String(localized: "Emergency Contacts"))
+        .alert("Error", isPresented: $showingErrorAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(errorMessage ?? "Unknown error")
+        }
+        .task {
+            await loadContacts()
+        }
+    }
+    
+    private var canAddContact: Bool {
+        !newContactEmail.isEmpty && isValidEmail(newContactEmail)
+    }
+    
+    private func isValidEmail(_ email: String) -> Bool {
+        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailPredicate = NSPredicate(format:"SELF MATCHES %@", emailRegex)
+        return emailPredicate.evaluate(with: email)
+    }
+    
+    private func loadContacts() async {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        do {
+            let profile = try await FirebaseService.shared.fetchUserProfile(userId: userId)
+            contacts = profile.emergencyContacts
+        } catch {
+            print("Error loading contacts: \(error)")
+        }
     }
     
     private func addContact() {
-        guard !newContactEmail.isEmpty else { return }
+        guard canAddContact else { return }
+        
         let newContact = EmergencyContact(email: newContactEmail)
-        contacts.append(newContact)
-        newContactEmail = ""
-        // TODO: Save to Firestore
+        let updatedContacts = contacts + [newContact]
+        
+        saveContacts(updatedContacts) {
+            contacts.append(newContact)
+            newContactEmail = ""
+        }
     }
     
     private func deleteContact(_ contact: EmergencyContact) {
-        contacts.removeAll { $0.id == contact.id }
-        // TODO: Update Firestore
+        var updatedContacts = contacts
+        updatedContacts.removeAll { $0.id == contact.id }
+        
+        saveContacts(updatedContacts) {
+            contacts = updatedContacts
+        }
+    }
+    
+    private func saveContacts(_ newContacts: [EmergencyContact], onSuccess: @escaping () -> Void) {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        isSaving = true
+        
+        Task {
+            do {
+                try await FirebaseService.shared.updateEmergencyContacts(userId: userId, contacts: newContacts)
+                onSuccess()
+            } catch {
+                errorMessage = error.localizedDescription
+                showingErrorAlert = true
+            }
+            isSaving = false
+        }
     }
 }
 

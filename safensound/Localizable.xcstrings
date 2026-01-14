@@ -4,9 +4,6 @@
     "%lld hours" : {
 
     },
-    "%lld 小時" : {
-
-    },
     "Add" : {
 
     },
@@ -75,6 +72,9 @@
     "Daily Reminder" : {
 
     },
+    "Delete" : {
+
+    },
     "Email (Optional)" : {
 
     },
@@ -101,6 +101,9 @@
       }
     },
     "Enable Daily Reminder" : {
+
+    },
+    "Enabling daily reminder will send you a local notification at your set time." : {
 
     },
     "Error" : {
@@ -160,6 +163,9 @@
 
     },
     "If you don't check in within %lld hours, we'll send an email to your emergency contacts." : {
+
+    },
+    "Interface Language" : {
 
     },
     "Joey, 美好的一天開始了" : {
@@ -261,6 +267,9 @@
     "Save" : {
 
     },
+    "Save Settings" : {
+
+    },
     "Settings" : {
       "localizations" : {
         "en" : {
@@ -319,6 +328,12 @@
           }
         }
       }
+    },
+    "Tip: You can add multiple family emails and inform them to look out for Safe & Sound emails." : {
+
+    },
+    "Tip: You can add multiple family emails. Please inform them to look out for Safe & Sound emails." : {
+
     },
     "Warning" : {
       "localizations" : {
@@ -379,13 +394,7 @@
     "保持好心情，若親友收到未簽到郵件，請他們儘快聯繫您確認安全。" : {
 
     },
-    "儲存設定並同步" : {
-
-    },
     "最後簽到: %@" : {
-
-    },
-    "刪除" : {
 
     },
     "安全計時: %@" : {
@@ -394,16 +403,10 @@
     "已新增 %lld 位緊急聯絡人" : {
 
     },
-    "提示：可新增多位家人信箱，並告知他們留意活著麼的提醒郵件。" : {
-
-    },
     "提醒閾值: 超過%lld小時未簽到將向聯絡人寄送郵件" : {
 
     },
     "提醒閾值：%lld 小時未簽到" : {
-
-    },
-    "新增" : {
 
     },
     "每日提醒" : {
@@ -412,13 +415,7 @@
     "每日提醒：%@" : {
 
     },
-    "每日提醒簽到" : {
-
-    },
     "繁體中文" : {
-
-    },
-    "開啟每日提醒後，會在您設定的時間推送本地通知提醒您簽到。" : {
 
     }
   },

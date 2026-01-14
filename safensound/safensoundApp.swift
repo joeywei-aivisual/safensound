@@ -37,6 +37,7 @@ struct safensoundApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     @State private var isAuthReady = false
+    @AppStorage(.preferredLanguage) private var preferredLanguage = "en"
     
     init() {
         // ToDo: Configure App Check before Firebase initialization
@@ -51,6 +52,7 @@ struct safensoundApp: App {
         WindowGroup {
             if isAuthReady {
                 ContentView()
+                    .environment(\.locale, Locale(identifier: preferredLanguage))
             } else {
                 ProgressView("Starting SafeNSound...")
                     .task {

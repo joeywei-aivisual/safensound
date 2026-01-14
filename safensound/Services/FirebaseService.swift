@@ -55,6 +55,45 @@ class FirebaseService {
         logger.info("✅ User details updated for user: \(userId)")
     }
     
+    func updateEmergencyContacts(userId: String, contacts: [EmergencyContact]) async throws {
+        let contactsData = try contacts.map { try Firestore.Encoder().encode($0) }
+        
+        let data: [String: Any] = [
+            "emergencyContacts": contactsData,
+            "lastUpdated": FieldValue.serverTimestamp()
+        ]
+        
+        try await db.collection("users").document(userId).updateData(data)
+        logger.info("✅ Emergency contacts updated for user: \(userId)")
+    }
+    
+    func updateDailyReminder(userId: String, enabled: Bool, time: Date?, threshold: Int) async throws {
+        var data: [String: Any] = [
+            "dailyReminderEnabled": enabled,
+            "checkInThreshold": threshold,
+            "lastUpdated": FieldValue.serverTimestamp()
+        ]
+        
+        if let time = time {
+            data["dailyReminderTime"] = time
+        } else {
+            data["dailyReminderTime"] = FieldValue.delete()
+        }
+        
+        try await db.collection("users").document(userId).updateData(data)
+        logger.info("✅ Daily reminder settings updated for user: \(userId)")
+    }
+    
+    func updateLanguage(userId: String, languageCode: String) async throws {
+        let data: [String: Any] = [
+            "preferredLanguage": languageCode,
+            "lastUpdated": FieldValue.serverTimestamp()
+        ]
+        
+        try await db.collection("users").document(userId).updateData(data)
+        logger.info("✅ Language preference updated for user: \(userId)")
+    }
+    
     // MARK: - Heartbeat Recording
     
     func recordHeartbeat(timezone: String, deviceInfo: [String: String]) async throws -> [String: Any] {
