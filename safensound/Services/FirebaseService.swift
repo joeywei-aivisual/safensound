@@ -34,6 +34,28 @@ class FirebaseService {
     
     // MARK: - User Profile
     
+    /// Ensures user profile exists with default values if it doesn't
+    private func ensureProfileExists(userId: String) async throws {
+        let docRef = db.collection("users").document(userId)
+        let snapshot = try await docRef.getDocument()
+        
+        if !snapshot.exists {
+            // Create default profile
+            let defaultProfile = UserProfile(
+                userId: userId,
+                name: "User",
+                email: "",
+                checkInThreshold: 72,
+                emergencyContacts: [],
+                dailyReminderEnabled: false,
+                preferredLanguage: "en",
+                timezone: TimeZone.current.identifier
+            )
+            try docRef.setData(from: defaultProfile)
+            logger.info("✅ Created default profile for user: \(userId)")
+        }
+    }
+    
     func saveUserProfile(_ profile: UserProfile) async throws {
         try db.collection("users").document(profile.userId).setData(from: profile)
         logger.info("✅ User profile saved for user: \(profile.userId)")
@@ -41,10 +63,25 @@ class FirebaseService {
     
     func fetchUserProfile(userId: String) async throws -> UserProfile {
         let snapshot = try await db.collection("users").document(userId).getDocument()
-        return try snapshot.data(as: UserProfile.self)
+        
+        // If document doesn't exist, return nil (caller should handle this gracefully)
+        guard snapshot.exists else {
+            throw FirebaseError.functionError("User profile not found")
+        }
+        
+        // Try to decode, but handle decoding errors gracefully
+        do {
+            return try snapshot.data(as: UserProfile.self)
+        } catch {
+            logger.error("Failed to decode user profile: \(error.localizedDescription)")
+            throw FirebaseError.functionError("Failed to decode user profile")
+        }
     }
     
     func updatePersonalDetails(userId: String, name: String, email: String) async throws {
+        // Ensure profile exists before updating
+        try await ensureProfileExists(userId: userId)
+        
         let data: [String: Any] = [
             "name": name,
             "email": email,
@@ -56,6 +93,9 @@ class FirebaseService {
     }
     
     func updateEmergencyContacts(userId: String, contacts: [EmergencyContact]) async throws {
+        // Ensure profile exists before updating
+        try await ensureProfileExists(userId: userId)
+        
         let contactsData = try contacts.map { try Firestore.Encoder().encode($0) }
         
         let data: [String: Any] = [
@@ -68,6 +108,9 @@ class FirebaseService {
     }
     
     func updateDailyReminder(userId: String, enabled: Bool, time: Date?, threshold: Int) async throws {
+        // Ensure profile exists before updating
+        try await ensureProfileExists(userId: userId)
+        
         var data: [String: Any] = [
             "dailyReminderEnabled": enabled,
             "checkInThreshold": threshold,

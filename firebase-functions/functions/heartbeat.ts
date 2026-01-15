@@ -40,12 +40,35 @@ async function recordHeartbeatHandler(request: any) {
     });
 
     // Update user's lastHeartbeat and timezone
+    // Use set with merge to create profile if it doesn't exist
     const userRef = db.collection('users').doc(userId);
-    await userRef.update({
-      lastHeartbeat: now,
-      timezone,
-      lastUpdated: now
-    });
+    const userDoc = await userRef.get();
+    
+    if (!userDoc.exists) {
+      // Create default profile if it doesn't exist
+      await userRef.set({
+        userId,
+        name: 'User',
+        email: '',
+        checkInThreshold: 72,
+        emergencyContacts: [],
+        lastHeartbeat: now,
+        dailyReminderEnabled: false,
+        dailyReminderTime: null,
+        preferredLanguage: 'en',
+        timezone,
+        createdAt: now,
+        isActive: true,
+        lastUpdated: now
+      }, { merge: true });
+    } else {
+      // Update existing profile
+      await userRef.update({
+        lastHeartbeat: now,
+        timezone,
+        lastUpdated: now
+      });
+    }
 
     // Cancel any pending alerts for this user
     const pendingAlerts = await db

@@ -25,7 +25,9 @@ class UserProfileManager: ObservableObject {
                 let profile = try await FirebaseService.shared.fetchUserProfile(userId: userId)
                 self.userProfile = profile
             } catch {
-                print("Error loading profile: \(error)")
+                // Profile doesn't exist yet - this is OK, it will be created on first check-in
+                print("Profile not found (will be created on first check-in): \(error)")
+                self.userProfile = nil
             }
             isLoading = false
         }
