@@ -154,6 +154,20 @@ class FirebaseService {
         return try await callFirebaseFunction(functionName: functionName, data: requestData)
     }
     
+    // MARK: - Emergency SOS
+    
+    func triggerSOS() async throws -> [String: Any] {
+        guard Auth.auth().currentUser?.uid != nil else {
+            throw FirebaseError.functionError("User not authenticated")
+        }
+        
+        // Empty data dictionary - userId is handled server-side via auth
+        let requestData: [String: Any] = [:]
+        
+        let functionName = getFunctionName("triggerSOS")
+        return try await callFirebaseFunction(functionName: functionName, data: requestData)
+    }
+    
     // MARK: - Firebase Functions Helper (Callable)
     
     /// Generic Firebase Function call that returns dictionary

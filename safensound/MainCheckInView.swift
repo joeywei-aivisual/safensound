@@ -13,6 +13,7 @@ struct MainCheckInView: View {
     @ObservedObject private var userProfileManager = UserProfileManager.shared
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage(.onboardingCompleted) private var onboardingCompleted = true // Disabled for now
+    @State private var showEmergencySheet = false
     
     var body: some View {
         NavigationView {
@@ -125,6 +126,12 @@ struct MainCheckInView: View {
             .navigationTitle("Safe & Sound")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { showEmergencySheet = true }) {
+                        Image(systemName: "exclamationmark.shield.fill")
+                            .foregroundColor(.red)
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: SettingsView()) {
                         Image(systemName: "gearshape.fill")
@@ -140,6 +147,9 @@ struct MainCheckInView: View {
             }
             .sheet(isPresented: .constant(!onboardingCompleted)) {
                 OnboardingView()
+            }
+            .sheet(isPresented: $showEmergencySheet) {
+                EmergencySheetView()
             }
         }
         .preferredColorScheme(.dark)
@@ -217,7 +227,7 @@ class MainCheckInViewModel: ObservableObject {
     func startTimer() {
         updateRemainingTime()
         timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
                 self?.updateRemainingTime()
             }
         }

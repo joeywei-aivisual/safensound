@@ -125,7 +125,8 @@ async function sendEmailAlert(userId: string, alertData: any) {
     emergencyContacts,
     lastHeartbeat,
     timezone,
-    thresholdHours: alertData.thresholdHours || 72
+    thresholdHours: alertData.thresholdHours || 72,
+    type: 'missed_checkin'
   });
 
   console.log(`Email alert sent for user ${userId} to ${emergencyContacts.length} contacts`);
