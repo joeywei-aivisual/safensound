@@ -12,7 +12,7 @@ struct MainCheckInView: View {
     @StateObject private var viewModel = MainCheckInViewModel()
     @ObservedObject private var userProfileManager = UserProfileManager.shared
     @Environment(\.scenePhase) private var scenePhase
-    @AppStorage(.onboardingCompleted) private var onboardingCompleted = false
+    @AppStorage(.onboardingCompleted) private var onboardingCompleted = true // Disabled for now
     
     var body: some View {
         NavigationView {
